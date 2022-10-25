@@ -6,6 +6,45 @@ from datetime import datetime, date
 from zhdate import ZhDate
 import sys
 import os
+import datetime as pt
+
+# 计算大姨妈(姨妈日期，今日日期，周期，每月推迟天数
+def ym():
+    a = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.date(datetime(year=int(a.split("-")[0]), month=int(a.split("-")[1]), day=int(a.split("-")[2])))
+    lastday = today + pt.timedelta(days=0)
+    tempday = 0
+    round=31
+    ym = 6
+    momday1 = '2022-10-10'
+    mm_year = int(momday1.split("-")[0])
+    mm_month = int(momday1.split("-")[1])
+    mm_day = int(momday1.split("-")[2])
+    momday = date(mm_year, mm_month, mm_day)
+    sumdays = str(today.__sub__(momday)).split(" ")[0]
+    days = int(int(sumdays) / round)
+    TempDay = tempday * days
+    delta = pt.timedelta(days=days * round + TempDay)
+    startday = momday + delta
+    delta = pt.timedelta(days=ym - 1)
+    lastday = startday + delta
+    if startday <= today <= lastday:
+        if today != lastday:
+            time1 = str(today.__sub__(startday))[0]
+            mytext = '今天是来姨妈的第' + str(int(time1) + 1) + '天，还要坚持' + \
+                         str(lastday.__sub__(today)).split(" ")[0] + '天哦'
+        else:
+                mytext = '今天是来姨妈的最后一天，明天就可以愉快地玩耍啦'
+    else:
+        a = int(str(lastday.__sub__(today)).split(" ")[0]) + 1
+        if a <= 0:
+            dy = 32 - ym - abs(a)
+        else:
+            dy = a - ym
+        ym_data = '大姨妈还有' + str(dy) + '天到达战场'
+    
+    
+    return ym_data
 
 
 def yq(region, config_data):
@@ -238,6 +277,8 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
     # date1 = datetime.now()
     # 获取所有纪念日数据
     commemoration_data = get_commemoration_data(today, config)
+    # 获取所有经期数据
+    ym_data = ym()
     # 获取所有生日数据
     birthdays = {}
     for k, v in config.items():
@@ -313,6 +354,10 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
                 "value": yq,
                 "color": color("color_yq", config)
             },
+            "ym": {
+                "value": ym_data,
+                "color": color("color_ym", config)
+            },
 
         }
     }
@@ -327,7 +372,7 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
         else:
             birthday_data = "距离{}的生日还有{}天".format(value["name"], birth_day)
         # 将生日数据插入data
-        data["data"][key] = {"value": birthday_data, "color": color("color_{}".format(key), config)}
+        data["data"][key] = {"value": birthday_data, "color": color("color_{}".format(key), config)}       
     headers = {
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
@@ -382,6 +427,8 @@ def handler(event, context):
         # 获取词霸每日金句
         note_ch, note_en = get_ciba()
     chp = get_tianhang(config)
+    # 获取经期数据
+    ym_data = ym()
     # 获取疫情数据
     yq_data = yq(region, config)
     # 公众号推送消息
