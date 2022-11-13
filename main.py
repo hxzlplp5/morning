@@ -31,10 +31,10 @@ def ym():
     if startday <= today <= lastday:
         if today != lastday:
             time1 = str(today.__sub__(startday))[0]
-            mytext = '今天是来姨妈的第' + str(int(time1) + 1) + '天，还要坚持' + \
+            ym_data = '今天是来姨妈的第' + str(int(time1) + 1) + '天，还要坚持' + \
                          str(lastday.__sub__(today)).split(" ")[0] + '天哦'
         else:
-                mytext = '今天是来姨妈的最后一天，明天就可以愉快地玩耍啦'
+            ym_data = '今天是来姨妈的最后一天，明天就可以愉快地玩耍啦'
     else:
         a = int(str(lastday.__sub__(today)).split(" ")[0]) + 1
         if a <= 0:
